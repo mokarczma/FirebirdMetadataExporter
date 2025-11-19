@@ -13,11 +13,29 @@ namespace DbMetaTool
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Użycie:");
-                Console.WriteLine("  build-db --db-dir <ścieżka> --scripts-dir <ścieżka>");
-                Console.WriteLine("  export-scripts --connection-string <connStr> --output-dir <ścieżka>");
-                Console.WriteLine("  update-db --connection-string <connStr> --scripts-dir <ścieżka>");
-                return 1;
+                Console.WriteLine("Tryb interaktywny.");
+                Console.WriteLine("Przykłady:");
+                Console.WriteLine(@"  build-db --db-dir ""C:\db\clone"" --scripts-dir ""C:\scripts""");
+                Console.WriteLine(@"  export-scripts --connection-string ""User=SYSDBA;Password=masterkey;Database=C:\db\source.fdb;DataSource=localhost;Charset=UTF8"" --output-dir ""C:\out""");
+                Console.WriteLine(@"  update-db --connection-string ""User=SYSDBA;Password=masterkey;Database=C:\db\source.fdb;DataSource=localhost;Charset=UTF8"" --scripts-dir ""C:\scripts""");
+                Console.WriteLine();
+
+                while (true)
+                {
+                    var input = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(input))
+                        continue;
+
+                    if (input.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return 0;
+                    }
+
+                    args = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    return Main(args);
+                }
             }
 
             try
@@ -194,7 +212,6 @@ namespace DbMetaTool
             var tablesSb = new StringBuilder();
             tablesSb.AppendLine("-- TABLES");
 
-            // lista tabel użytkownika
             var tables = new List<string>();
             using (var tableCmd = new FbCommand(@"
         SELECT TRIM(rdb$relation_name)
@@ -368,7 +385,7 @@ namespace DbMetaTool
                 {
                     var commandText = sb.ToString().Trim();
 
-                    // usuwamy końcowe średniki, żeby nie bruździły
+                    // usuwamy końcowe średniki
                     while (commandText.EndsWith(";"))
                         commandText = commandText[..^1].TrimEnd();
 
