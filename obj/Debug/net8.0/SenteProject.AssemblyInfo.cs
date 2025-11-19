@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SenteProject")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6fd7f56f1ccd13445f932221d5391cc1383a7d26")]
 [assembly: System.Reflection.AssemblyProductAttribute("SenteProject")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SenteProject")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
