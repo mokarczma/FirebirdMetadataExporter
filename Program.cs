@@ -171,8 +171,9 @@ namespace DbMetaTool
           FROM rdb$fields f
          WHERE (f.rdb$system_flag IS NULL OR f.rdb$system_flag = 0)
            AND f.rdb$field_name NOT LIKE 'RDB$%'
-           AND COALESCE(f.rdb$computed_blr, '') = ''
+           AND f.rdb$computed_blr IS NULL
     ", connection))
+
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
@@ -285,12 +286,60 @@ namespace DbMetaTool
         /// </summary>
         public static void UpdateDatabase(string connectionString, string scriptsDirectory)
         {
-            // TODO:
-            // 1) Połącz się z bazą danych przy użyciu connectionString.
-            // 2) Wykonaj skrypty z katalogu scriptsDirectory (tylko obsługiwane elementy).
-            // 3) Zadbaj o poprawną kolejność i bezpieczeństwo zmian.
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("Connection string nie może być pusty.", nameof(connectionString));
+
+            if (string.IsNullOrWhiteSpace(scriptsDirectory))
+                throw new ArgumentException("Katalog ze skryptami nie może być pusty.", nameof(scriptsDirectory));
+
+            if (!Directory.Exists(scriptsDirectory))
+                throw new DirectoryNotFoundException($"Katalog ze skryptami nie istnieje: {scriptsDirectory}");
+
+            var scriptFiles = Directory
+                .GetFiles(scriptsDirectory, "*.sql", SearchOption.TopDirectoryOnly)
+                .OrderBy(Path.GetFileName)
+                .ToArray();
+
+            if (scriptFiles.Length == 0)
+            {
+                Console.WriteLine($"Brak plików .sql w katalogu: {scriptsDirectory}");
+                return;
+            }
+
+            using var connection = new FbConnection(connectionString);
+            connection.Open();
+
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                foreach (var file in scriptFiles)
+                {
+                    Console.WriteLine($"Wykonywanie skryptu (update): {file}");
+                    var sql = File.ReadAllText(file);
+                    ExecuteSqlScript(connection, transaction, sql);
+                }
+
+                transaction.Commit();
+                Console.WriteLine("Aktualizacja bazy danych zakończona powodzeniem.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Błąd podczas aktualizacji bazy danych, wycofywanie transakcji.");
+                Console.WriteLine(ex.Message);
+
+                try
+                {
+                    transaction.Rollback();
+                }
+                catch (Exception rollbackEx)
+                {
+                    Console.WriteLine("Błąd podczas rollback: " + rollbackEx.Message);
+                }
+
+                throw;
+            }
         }
+
 
 
         /// <summary>

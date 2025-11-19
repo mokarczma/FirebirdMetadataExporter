@@ -15,3 +15,4 @@ C:\Users\monika\source\repos\SenteProject\SenteProject\obj\Debug\net8.0\ref\Sent
 C:\Users\monika\source\repos\SenteProject\SenteProject\bin\Debug\net8.0\FirebirdSql.Data.FirebirdClient.dll
 C:\Users\monika\source\repos\SenteProject\SenteProject\obj\Debug\net8.0\SenteProject.csproj.AssemblyReference.cache
 C:\Users\monika\source\repos\SenteProject\SenteProject\obj\Debug\net8.0\SentePro.1CFA69F3.Up2Date
+C:\Users\monika\source\repos\SenteProject\SenteProject\obj\Debug\net8.0\SenteProject.sourcelink.json
